@@ -1,0 +1,126 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
+from sklearn.cluster import KMeans, k_means, DBSCAN, AgglomerativeClustering, OPTICS
+from sklearn.neighbors import NearestNeighbors
+
+df = pd.read_csv("C:/Users/carol/OneDrive/Documents/jain.txt", sep="\s+", header=None)
+
+#STEP 1 LOAD DATASET AND VISUALISE HOW THE DATA LOOKS
+#Graph over the dataset   
+plt.scatter(df[0], df[1], c=df[2])
+title_str = "Jain dataset clustering\n(n = 373, k = 2 clusters, dimension = 2)"
+plt.title(title_str, fontsize=14, pad=20)
+plt.show()
+
+#Træne algoritmer på x,y - og ikke den rigtige clusterfordeling df(2)
+x = df[[0, 1]]
+
+# K-Means
+kmeans = KMeans(n_clusters=2,n_init=20, random_state=42)
+kmeans.fit(x)
+labels1 = kmeans.predict(x)
+
+plt.scatter(df[0],df[1],c=labels1)
+title_str = ("K-Means")
+plt.title(title_str, fontsize=14, pad=20)
+plt.show()
+
+
+# Lloyd algorithm 
+Lloyd = k_means(x, n_clusters=2)
+labels2 = Lloyd[1]
+
+plt.scatter(df[0],df[1],c=labels2)
+title_str = ("Lloyd")
+plt.title(title_str, fontsize=14, pad=20)
+plt.show()
+
+# elkan agorithm 
+elkan = k_means(x, n_clusters=2, algorithm = 'elkan')
+labels3 = elkan[1]
+
+
+plt.scatter(df[0],df[1],c=labels3)
+title_str = ("Elkan")
+plt.title(title_str, fontsize=14, pad=20)
+plt.show()
+
+#Agglomerative Clustering: Single Link 
+agg_single = AgglomerativeClustering(n_clusters=2, linkage='single')
+labels4 = agg_single.fit_predict(x)
+
+plt.scatter(df[0], df[1], c=labels4, s=25)
+title_str = "Agglomerative Clustering - single"
+plt.title(title_str, fontsize=14, pad=20)
+plt.show()
+
+# Agglomerative Clustering: complete linkage
+agg_complete = AgglomerativeClustering(n_clusters=2, linkage='complete')
+labels5 = agg_complete.fit_predict(x)
+
+plt.scatter(df[0], df[1], c=labels5, s=25)
+title_str = "Agglomerative Clustering - complete"
+plt.title(title_str, fontsize=14, pad=20)
+plt.show()
+
+# Agglomerative Clustering: average linkage
+agg_average = AgglomerativeClustering(n_clusters=2, linkage='average')
+labels6 = agg_average.fit_predict(x)
+
+plt.scatter(df[0], df[1], c=labels6, s=25)
+title_str = "Agglomerative Clustering - average"
+plt.title(title_str, fontsize=14, pad=20)
+plt.show()
+
+##Forsøgt at sætte dem sammen de tre typer agglomerative##
+linkages = ["single", "complete", "average"]
+fig, axes = plt.subplots(1, 3, figsize=(15, 5))
+
+for i, linkage in enumerate(linkages):
+    model = AgglomerativeClustering(n_clusters=2, linkage=linkage)
+    labels = model.fit_predict(x)
+
+    axes[i].scatter(df[0], df[1], c=labels, s=25)
+    axes[i].set_title(f"Agglomerative - {linkage}")
+   
+plt.tight_layout()
+plt.show()
+
+#DBSCAN
+# Determining the epsilon parameter
+# Function to plot k-distance graph
+def plot_k_distance_graph(x, k):
+    neigh = NearestNeighbors(n_neighbors=k)
+    neigh.fit(x)
+    distances, _ = neigh.kneighbors(x)
+    distances = np.sort(distances[:, k-1])
+    plt.figure(figsize=(10, 6))
+    plt.plot(distances)
+    plt.xlabel('Points')
+    plt.ylabel(f'{k}-th nearest neighbor distance')
+    plt.title('K-distance Graph')
+    plt.show()
+# Plot k-distance graph
+plot_k_distance_graph(x, k=5)
+
+
+# Visualize the results of DBSCAN AND K-MEANS
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 6))
+ax1.scatter(df[0], df[1], c=labels7, cmap='viridis')
+ax1.set_title('DBSCAN Clustering')
+
+ax2.scatter(df[0], df[1], c=labels1, cmap='viridis')
+ax2.set_title('K-Means Clustering')
+plt.show()
+
+
+#OPTICS
+optics = OPTICS(min_samples=5, xi=0.05, min_cluster_size=0.05)
+labels8 = optics.fit_predict(x)
+
+# Plot clustering-resultatet
+plt.scatter(df[0], df[1], c=labels8, s=25)
+plt.title("OPTICS", fontsize=14, pad=20)
+plt.show()
+
