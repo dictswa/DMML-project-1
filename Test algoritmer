@@ -73,9 +73,19 @@ title_str = "Agglomerative Clustering - average"
 plt.title(title_str, fontsize=14, pad=20)
 plt.show()
 
-##Forsøgt at sætte dem sammen de tre typer agglomerative##
-linkages = ["single", "complete", "average"]
-fig, axes = plt.subplots(1, 3, figsize=(15, 5))
+# Agglomerative Clustering: ward clustering
+agg_ward = AgglomerativeClustering(n_clusters=2, linkage='ward')
+labels8 = agg_ward.fit_predict(x)
+
+plt.scatter(df[0], df[1], c=labels8, s=25)
+title_str = "Agglomerative Clustering - ward"
+plt.title(title_str, fontsize=14, pad=20)
+plt.show()
+
+
+#Forsøgt at sætte dem sammen de fire typer agglomerative
+linkages = ["single", "complete", "average", "ward"]
+fig, axes = plt.subplots(1, 4, figsize=(15, 5))
 
 for i, linkage in enumerate(linkages):
     model = AgglomerativeClustering(n_clusters=2, linkage=linkage)
